@@ -56,34 +56,22 @@ GLuint shader_program_create(const char* vertex_shader_source, const char* fragm
   return shader_program;
 }
 
-void set_uniform_1f(GLuint shader_program, char* name, float x, bool is_used) {
-  if (is_used) {
-    glUseProgram(shader_program);
-  }
+void set_uniform_1f(GLuint shader_program, char* name, float x) {
   GLint uniform_location = glGetUniformLocation(shader_program, name);
   glUniform1f(uniform_location, x);
 }
 
-void set_uniform_2f(GLuint shader_program, char* name, float x, float y, bool is_used) {
-  if (is_used) {
-    glUseProgram(shader_program);
-  }
+void set_uniform_2f(GLuint shader_program, char* name, float x, float y) {
   GLint uniform_location = glGetUniformLocation(shader_program, name);
   glUniform2f(uniform_location, x, y);
 }
 
-void set_uniform_3f(GLuint shader_program, char* name, float x, float y, float z, bool is_used) {
-  if (is_used) {
-    glUseProgram(shader_program);
-  }
+void set_uniform_3f(GLuint shader_program, char* name, float x, float y, float z) {
   GLint uniform_location = glGetUniformLocation(shader_program, name);
   glUniform3f(uniform_location, x, y, z);
 }
 
-void set_uniform_4f(GLuint shader_program, char* name, float x, float y, float z, float w, bool is_used) {
-  if (is_used) {
-    glUseProgram(shader_program);
-  }
+void set_uniform_4f(GLuint shader_program, char* name, float x, float y, float z, float w) {
   GLint uniform_location = glGetUniformLocation(shader_program, name);
   glUniform4f(uniform_location, x, y, z, w);
 }
