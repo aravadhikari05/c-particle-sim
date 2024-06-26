@@ -10,24 +10,25 @@
 #define WINDOW_LENGTH 640
 #define WINDOW_HEIGHT 480
 
-char* vertex_shader_source = "#version 410 core\n"
+const char* vertex_shader_source = "#version 410 core\n"
   "layout (location = 0) in vec3 aPos;\n"
   "uniform float x_offset;\n"
   "void main() {\n"
   "  gl_Position = vec4(aPos.x + x_offset, aPos.y, aPos.z, 1.0);\n"
   "}\0";
 
-char* fragment_shader_source = "#version 410 core\n"
+const char* fragment_shader_source = "#version 410 core\n"
   "out vec4 FragColor;\n"
   "void main() {\n"
   "  FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
   "}\0"; 
 
 void error_callback(int error, const char* description) {
-  fprintf(stderr, "Error: %s\n", description);
+  fprintf(stderr, "Error [%d]: %s\n", error, description);
 }
 
 static void size_callback(GLFWwindow* window, int width, int height) {
+  (void) window;
   glViewport(0, 0, width, height);
 }
 
@@ -82,21 +83,23 @@ int main(void) {
  
   glBindVertexArray(VAO);
   
-  float x_offset = 0.0f;
+  float x_offset1 = 0.0f;
+  float x_offset2 = 0.0f;
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(shader_program);
-    GLint x_offset_location = glGetUniformLocation(shader_program, "x_offset");
-    glUniform1f(x_offset_location, x_offset);
-
-    x_offset += 0.001f;
-
     glBindVertexArray(VAO);
+    x_offset1 += 0.0005f; 
+    set_uniform_1f(shader_program, "x_offset", x_offset1, true);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    x_offset2 -= 0.0005f; 
+    set_uniform_1f(shader_program, "x_offset", x_offset2, true);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
 
     glfwSwapBuffers(window);
     glfwPollEvents();

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <glad/gl.h>
+
+#include "shader.h"
 
 #define SHADER 1
 #define PROGRAM 2  
@@ -32,7 +33,7 @@ static void log_error(GLuint obj, int type) {
   }
 }
 
-GLuint shader_program_create(char* vertex_shader_source, char* fragment_shader_source) {
+GLuint shader_program_create(const char* vertex_shader_source, const char* fragment_shader_source) {
   GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
   glCompileShader(vertex_shader);
@@ -53,4 +54,36 @@ GLuint shader_program_create(char* vertex_shader_source, char* fragment_shader_s
   glDeleteShader(fragment_shader); 
 
   return shader_program;
+}
+
+void set_uniform_1f(GLuint shader_program, char* name, float x, bool is_used) {
+  if (is_used) {
+    glUseProgram(shader_program);
+  }
+  GLint uniform_location = glGetUniformLocation(shader_program, name);
+  glUniform1f(uniform_location, x);
+}
+
+void set_uniform_2f(GLuint shader_program, char* name, float x, float y, bool is_used) {
+  if (is_used) {
+    glUseProgram(shader_program);
+  }
+  GLint uniform_location = glGetUniformLocation(shader_program, name);
+  glUniform2f(uniform_location, x, y);
+}
+
+void set_uniform_3f(GLuint shader_program, char* name, float x, float y, float z, bool is_used) {
+  if (is_used) {
+    glUseProgram(shader_program);
+  }
+  GLint uniform_location = glGetUniformLocation(shader_program, name);
+  glUniform3f(uniform_location, x, y, z);
+}
+
+void set_uniform_4f(GLuint shader_program, char* name, float x, float y, float z, float w, bool is_used) {
+  if (is_used) {
+    glUseProgram(shader_program);
+  }
+  GLint uniform_location = glGetUniformLocation(shader_program, name);
+  glUniform4f(uniform_location, x, y, z, w);
 }
