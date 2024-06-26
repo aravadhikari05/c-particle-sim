@@ -3,7 +3,7 @@
 #include <glad/gl.h>
 
 #define SHADER 1
-#define SHADER_PROGRAM 2  
+#define PROGRAM 2  
 
 static void log_error(GLuint obj, int type) {
   int  success;
@@ -32,7 +32,7 @@ static void log_error(GLuint obj, int type) {
   }
 }
 
-GLuint create_shader_program(char* vertex_shader_source, char* fragment_shader_source) {
+GLuint shader_program_create(char* vertex_shader_source, char* fragment_shader_source) {
   GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
   glCompileShader(vertex_shader);
@@ -47,7 +47,7 @@ GLuint create_shader_program(char* vertex_shader_source, char* fragment_shader_s
   glAttachShader(shader_program, vertex_shader);
   glAttachShader(shader_program, fragment_shader);
   glLinkProgram(shader_program);
-  log_error(shader_program, SHADER_PROGRAM);
+  log_error(shader_program, PROGRAM);
   
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader); 
