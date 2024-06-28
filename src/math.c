@@ -9,6 +9,16 @@ struct vec2 vec2_create(float x, float y) {
   return self;
 }
 
+struct vec4 vec4_create(float x, float y, float z, float w) {
+  struct vec4 self = {
+    .x = x,
+    .y = y,
+    .z = z,
+    .w = w
+  };
+  return self;
+}
+
 struct vec2 vec2_add(struct vec2 a, struct vec2 b) {
   return vec2_create(a.x + b.x, a.y + b.y);
 }

@@ -12,8 +12,8 @@
 #include "math.h"
 
 
-int SCREEN_WIDTH = 400;
-int SCREEN_HEIGHT = 400;
+const int WIN_W = 400;
+const int WIN_H = 400;
 
 const char* vertex_shader_source = "#version 410 core\n"
   "layout (location = 0) in vec2 aPos;\n"
@@ -55,13 +55,13 @@ int main(void) {
     printf("GLFW could not be initialized\n");
     return -1;
   }
-
+  glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   
-  GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "phoenix", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(WIN_W, WIN_H, "phoenix", NULL, NULL);
   if (!window) {
     printf("Window could not be created\n");
     glfwTerminate();
@@ -71,7 +71,7 @@ int main(void) {
   gladLoadGL(glfwGetProcAddress);
 
   glfwSetFramebufferSizeCallback(window, size_callback);   
-glfwSwapInterval(1);
+  glfwSwapInterval(1);
 
   GLuint shader_program = shader_program_create(vertex_shader_source, fragment_shader_source); 
 
@@ -86,49 +86,46 @@ glfwSwapInterval(1);
      0.0f,  0.0f
   };
 
+  float line_vertices[] = {
+    -0.5f, 0.0f,
+     0.5f, 0.0f
+  };
+
   unsigned int indices[] = {
     0, 1, 3,
     1, 2, 3 
   };
+  
+  int num_vertices = 20;
+  float size = 70; 
 
+  float* circle_verts = circle_generate_verts(size, num_vertices);
+  unsigned int* circle_indices = circle_generate_indices(num_vertices);
+  
+  /*
   unsigned int pointVBO, pointVAO;
   unsigned int lineVBO, lineVAO;
   unsigned int triVBO, triVAO;
   unsigned int quadVBO, quadEBO, quadVAO;
-
-  unsigned int VBO, VAO, EBO;
+  */
+  unsigned int VBO, VAO, EBO, circle_vbo, circle_ebo;
   
   VAO = vao_create_and_bind();
-  VBO = bo_create_and_store(GL_ARRAY_BUFFER, sizeof(point_vertices), point_vertices, GL_STATIC_DRAW);   
-  //EBO = bo_create_and_store(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  VBO = bo_create_and_store(GL_ARRAY_BUFFER, sizeof(point_vertices), point_vertices, true);   
+  circle_vbo = bo_create_and_store(GL_ARRAY_BUFFER, sizeof(float) * 2 * num_vertices, circle_verts, true);
+  circle_ebo = bo_create_and_store(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * (num_vertices-2), circle_indices, true);
 
   vao_attrib(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*) 0);
- 
-  float rot = 0.0f; 
-  struct vec2 a = world_to_screen(vec2_create(300, 300));
-  
+
+  int count = 0;
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
     glClear(GL_COLOR_BUFFER_BIT);
-
-    //rot += 0.01f;
-
-    glBindVertexArray(VAO);
-    glUseProgram(shader_program);
-
-    //set_uniform_2f(shader_program, "scale", 0.5f, 0.5f);
-    //set_uniform_1f(shader_program, "rotation", rot);
-    a = vec2_add(a, vec2_create(-0.001f, 0.005f));
-
-    set_uniform_2f(shader_program, "translation", a.x, a.y);
-    set_uniform_4f(shader_program, "color", 1.0f, 0.5f, 0.25f, 1.0f);
-
-    //glDrawElements(GL_POINTS, 1, GL_UNSIGNED_INT, 0);
-    glPointSize(10.0f);
-    glDrawArrays(GL_POINTS, 0, 1);
-
+    
+    draw_circle(shader_program, VAO, 300, 200, (num_vertices - 2) * 3, vec4_create(255, 255, 0, 1.0)); 
+    
     glfwSwapBuffers(window);
     glfwPollEvents();
   }

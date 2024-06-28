@@ -11,7 +11,16 @@ struct vec3 {
   float z;
 };
 
+struct vec4 {
+  float x;
+  float y;
+  float z;
+  float w;
+};
+
 struct vec2 vec2_create(float x, float y);
+
+struct vec4 vec4_create(float x, float y, float z, float w);
 
 struct vec2 vec2_add(struct vec2 a, struct vec2 b);
 
