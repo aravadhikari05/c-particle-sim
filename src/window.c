@@ -129,8 +129,8 @@ int main(void) {
       draw_circle(shader_program, circle_vao, bodies[i].position, bodies[i].radius, vec4_create(255, 255, 0, 1.0), (num_vertices - 2) * 3); 
       
       bodies[i].acceleration.y = grav / bodies[i].mass;
-      bodies[i].position.y += bodies[i].velocity.y;
       bodies[i].velocity.y += bodies[i].acceleration.y;
+      bodies[i].position.y += bodies[i].velocity.y;
       if (bodies[i].position.y + bodies[i].radius >= WIN_H - 1) {
         bodies[i].position.y = WIN_H - 1 - bodies[i].radius;
         bodies[i].velocity.y = -bodies[i].velocity.y;
