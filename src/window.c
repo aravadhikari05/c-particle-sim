@@ -10,10 +10,11 @@
 #include "obj.h"
 #include "draw.h"
 #include "math.h"
+#include "body.h"
 
 
-const int WIN_W = 400;
-const int WIN_H = 400;
+const int WIN_W = 500;
+const int WIN_H = 500;
 
 const char* vertex_shader_source = "#version 410 core\n"
   "layout (location = 0) in vec2 aPos;\n"
@@ -96,35 +97,42 @@ int main(void) {
     1, 2, 3 
   };
   
-  int num_vertices = 20;
-  float size = 70; 
+  int num_vertices = 32;
+  float size = 1.0f/WIN_W; 
 
   float* circle_verts = circle_generate_verts(size, num_vertices);
   unsigned int* circle_indices = circle_generate_indices(num_vertices);
   
-  /*
-  unsigned int pointVBO, pointVAO;
-  unsigned int lineVBO, lineVAO;
-  unsigned int triVBO, triVAO;
-  unsigned int quadVBO, quadEBO, quadVAO;
-  */
-  unsigned int VBO, VAO, EBO, circle_vbo, circle_ebo;
+  unsigned int circle_vao, circle_vbo, circle_ebo;
   
-  VAO = vao_create_and_bind();
-  VBO = bo_create_and_store(GL_ARRAY_BUFFER, sizeof(point_vertices), point_vertices, true);   
+  circle_vao = vao_create_and_bind();
   circle_vbo = bo_create_and_store(GL_ARRAY_BUFFER, sizeof(float) * 2 * num_vertices, circle_verts, true);
   circle_ebo = bo_create_and_store(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * (num_vertices-2), circle_indices, true);
 
   vao_attrib(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*) 0);
-
-  int count = 0;
+    
+  int len_bodies = 10;
+  struct body bodies[len_bodies];
+  for (int i = 0; i < len_bodies; i++) {
+    float x_pos = (WIN_W / (float) len_bodies * i) + (WIN_W / (float) len_bodies * 0.5f);
+    struct body bod = body_create(5.0f, i * 2, vec2_create(x_pos, 200.0f)); 
+    bodies[i] = bod;
+  }
   while (!glfwWindowShouldClose(window)) {
     processInput(window);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
     glClear(GL_COLOR_BUFFER_BIT);
-    
-    draw_circle(shader_program, VAO, 300, 200, (num_vertices - 2) * 3, vec4_create(255, 255, 0, 1.0)); 
+   
+    for (int i = 0; i < len_bodies; i++) {
+      draw_circle(shader_program, circle_vao, bodies[i].position, bodies[i].radius, vec4_create(255, 255, 0, 1.0), (num_vertices - 2) * 3); 
+      if (bodies[i].position.y + bodies[i].radius >= WIN_H - 1) {
+        bodies[i].position.y = WIN_H - 1 - bodies[i].radius;
+      } else {
+        bodies[i].position.y += 1;
+      }
+    } 
+
     
     glfwSwapBuffers(window);
     glfwPollEvents();

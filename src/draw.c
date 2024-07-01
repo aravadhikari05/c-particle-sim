@@ -7,8 +7,8 @@
 
 struct vec2 world_to_screen(struct vec2 a) {
 
-  a.x /= (WIN_W / 2);
-  a.y /= (WIN_H / 2);
+  a.x /= ((WIN_W - 1) / 2);
+  a.y /= ((WIN_H - 1) / 2);
 
   a.x -= 1;
   a.y -= 1;
@@ -40,14 +40,12 @@ void draw_point(GLuint shader_program, GLuint VAO, int x0, int y0, struct vec4 c
 }
 
 float* circle_generate_verts(float radius, int num_verts) {
-  radius /= WIN_W;
   float* verts = malloc(sizeof(float) * num_verts * 2);
   float angle = 360.f/num_verts;
   double deg_to_rad = M_PI/180;
   for (int i = 0; i < num_verts; i++) {
     float current_angle = (float) (i * angle * deg_to_rad);
     struct vec2 pos = vec2_create((float) (radius * cos(current_angle)), (float) (radius * sin(current_angle)));
-    //pos = world_to_screen(pos);
     verts[2 * i] = pos.x;
     verts[2 * i + 1] = pos.y;
   }
@@ -63,15 +61,15 @@ unsigned int* circle_generate_indices(int num_verts) {
   }
   return indices;
 }
-void draw_circle(GLuint shader_program, GLuint VAO, int x0, int y0, int num_indices, struct vec4 color) {
-  struct vec2 pos = vec2_create((float) x0, (float) y0);
+void draw_circle(GLuint shader_program, GLuint VAO, struct vec2 pos, float scale, struct vec4 color, int num_elements) {
   pos = world_to_screen(pos);
   color = normalize_rgba(color);
 
   glBindVertexArray(VAO);
   glUseProgram(shader_program);
   set_uniform_2f(shader_program, "translation", pos.x, pos.y);
+  set_uniform_2f(shader_program, "scale", scale, scale);
   set_uniform_4f(shader_program, "color", color.x, color.y, color.z, color.w);
 
-  glDrawElements(GL_TRIANGLES, num_indices, GL_UNSIGNED_INT, (void*) 0); 
+  glDrawElements(GL_TRIANGLES, num_elements, GL_UNSIGNED_INT, (void*) 0); 
 }

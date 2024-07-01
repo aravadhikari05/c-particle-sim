@@ -27,7 +27,11 @@ struct vec2 vec2_multiply(struct vec2 a, struct vec2 b) {
   return vec2_create(a.x * b.x, a.y * b.y);
 }
 
-struct vec2 vec2_inverse (struct vec2 a) {
+float vec2_dot(struct vec2 a, struct vec2 b) {
+  return a.x * b.x + a.y * b.y;
+}
+
+struct vec2 vec2_inverse(struct vec2 a) {
   return vec2_create(1 / a.x, 1 / a.y);
 }
 
@@ -35,14 +39,6 @@ struct vec2 vec2_scalar(struct vec2 a, float s) {
   return vec2_create(s * a.x, s * a.y);
 }
  
-struct vec3 vec2_to_vec3(struct vec2 a) {
-  struct vec3 self = {
-    .x = a.x,
-    .y = a.y,
-    .z = 0.0f
-  };
-  return self;
-}
 
 
 
