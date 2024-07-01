@@ -115,7 +115,7 @@ int main(void) {
   struct body bodies[len_bodies];
   for (int i = 0; i < len_bodies; i++) {
     float x_pos = (WIN_W / (float) len_bodies * i) + (WIN_W / (float) len_bodies * 0.5f);
-    struct body bod = body_create(5.0f, i * 2, vec2_create(x_pos, 200.0f)); 
+    struct body bod = body_create(i, i * 2, vec2_create(x_pos, 200.0f)); 
     bodies[i] = bod;
   }
   while (!glfwWindowShouldClose(window)) {
@@ -129,7 +129,7 @@ int main(void) {
       if (bodies[i].position.y + bodies[i].radius >= WIN_H - 1) {
         bodies[i].position.y = WIN_H - 1 - bodies[i].radius;
       } else {
-        bodies[i].position.y += 1;
+        bodies[i].position.y += 1 + (bodies[i].mass * 0.05);
       }
     } 
 
