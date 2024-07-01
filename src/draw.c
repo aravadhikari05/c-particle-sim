@@ -67,9 +67,18 @@ void draw_circle(GLuint shader_program, GLuint VAO, struct vec2 pos, float scale
 
   glBindVertexArray(VAO);
   glUseProgram(shader_program);
+ 
+  set_uniform_1f(shader_program, "rotation", 0);
   set_uniform_2f(shader_program, "translation", pos.x, pos.y);
   set_uniform_2f(shader_program, "scale", scale, scale);
   set_uniform_4f(shader_program, "color", color.x, color.y, color.z, color.w);
 
   glDrawElements(GL_TRIANGLES, num_elements, GL_UNSIGNED_INT, (void*) 0); 
+}
+
+void reset_shader(GLuint shader_program) {
+    set_uniform_2f(shader_program, "translation", 0, 0);
+    set_uniform_2f(shader_program, "scale", 1, 1);
+    set_uniform_4f(shader_program, "color", 1, 1, 1, 1);
+    set_uniform_1f(shader_program, "rotation", 0);
 }

@@ -15,3 +15,5 @@ float* circle_generate_verts(float radius, int num_verts);
 unsigned int* circle_generate_indices(int num_verts); 
 
 void draw_circle(GLuint shader_program, GLuint VAO, struct vec2 pos, float scale, struct vec4 color, int num_elements);
+
+void reset_shader(GLuint shader_program);

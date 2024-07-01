@@ -46,7 +46,15 @@ static void size_callback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow *window) {
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    printf("%f, %f\n", xpos, ypos);
+  }  
+}
+
+void process_input(GLFWwindow *window) {
   if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
 }
@@ -72,6 +80,8 @@ int main(void) {
   gladLoadGL(glfwGetProcAddress);
 
   glfwSetFramebufferSizeCallback(window, size_callback);   
+  glfwSetMouseButtonCallback(window, mouse_button_callback);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
   glfwSwapInterval(1);
 
   GLuint shader_program = shader_program_create(vertex_shader_source, fragment_shader_source); 
@@ -103,46 +113,75 @@ int main(void) {
   float* circle_verts = circle_generate_verts(size, num_vertices);
   unsigned int* circle_indices = circle_generate_indices(num_vertices);
   
-  unsigned int circle_vao, circle_vbo, circle_ebo;
+  unsigned int line_vao, line_vbo, circle_vao, circle_vbo, circle_ebo;
   
-  circle_vao = vao_create_and_bind();
-  circle_vbo = bo_create_and_store(GL_ARRAY_BUFFER, sizeof(float) * 2 * num_vertices, circle_verts, true);
-  circle_ebo = bo_create_and_store(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * (num_vertices-2), circle_indices, true);
+  line_vao = vao_create_and_bind();
+  line_vbo = bo_create_and_store(GL_ARRAY_BUFFER, sizeof(line_vertices), line_vertices, false);
+  vao_attrib(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*) 0); 
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+  circle_vao = vao_create_and_bind();
+  circle_vbo = bo_create_and_store(GL_ARRAY_BUFFER, sizeof(float) * 2 * num_vertices, circle_verts, false);
+  circle_ebo = bo_create_and_store(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * (num_vertices-2), circle_indices, true);
   vao_attrib(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*) 0);
     
   int len_bodies = 10;
   struct body bodies[len_bodies];
   for (int i = 0; i < len_bodies; i++) {
     float x_pos = (WIN_W / (float) len_bodies * i) + (WIN_W / (float) len_bodies * 0.5f);
-    struct body bod = body_create(i+1, i+1, vec2_create(x_pos, 200.0f), vec2_zero()); 
+    struct body bod = body_create(i+1, i+1, vec2_create(x_pos, 250.0f), vec2_zero()); 
     bodies[i] = bod;
   }
   float grav = 0.05f;
+
+  const double fps_limit = 1.0/60.0;
+  double last_frame = 0.0; 
+
   while (!glfwWindowShouldClose(window)) {
-    processInput(window);
-
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
-    glClear(GL_COLOR_BUFFER_BIT);
-   
-    for (int i = 0; i < len_bodies; i++) {
-      draw_circle(shader_program, circle_vao, bodies[i].position, bodies[i].radius, vec4_create(255, 255, 0, 1.0), (num_vertices - 2) * 3); 
-      
-      bodies[i].acceleration.y = grav / bodies[i].mass;
-      bodies[i].velocity.y += bodies[i].acceleration.y;
-      bodies[i].position.y += bodies[i].velocity.y;
-      if (bodies[i].position.y + bodies[i].radius >= WIN_H - 1) {
-        bodies[i].position.y = WIN_H - 1 - bodies[i].radius;
-        bodies[i].velocity.y = -bodies[i].velocity.y;
-      } else if (bodies[i].position.y - bodies[i].radius <= 0) { 
-        bodies[i].position.y = bodies[i].radius;
-        bodies[i].velocity.y = -bodies[i].velocity.y;
-      } 
-    } 
-
+    double now = glfwGetTime();
     
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+
+    process_input(window);
+
+   
+    if (now - last_frame >= fps_limit) {
+      glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
+      glClear(GL_COLOR_BUFFER_BIT);
+
+      set_uniform_2f(shader_program, "translation", 0, 0);
+      set_uniform_2f(shader_program, "scale", 2, 1);
+      set_uniform_4f(shader_program, "color", 1, 0, 0, 1);
+
+      glBindVertexArray(line_vao);
+      glUseProgram(shader_program);
+      glDrawArrays(GL_LINES, 0, 2);
+    
+      double xpos, ypos;
+      glfwGetCursorPos(window, &xpos, &ypos);
+      draw_circle(shader_program, circle_vao, vec2_create(xpos, ypos), 5.0f, vec4_create(0, 255, 0, 1.0), (num_vertices - 2) * 3); 
+
+
+      for (int i = 0; i < len_bodies; i++) {
+
+        draw_circle(shader_program, circle_vao, bodies[i].position, bodies[i].radius, vec4_create(255, 255, 0, 1.0), (num_vertices - 2) * 3); 
+        
+        bodies[i].acceleration.y = grav / bodies[i].mass;
+        bodies[i].velocity.y += bodies[i].acceleration.y;
+        bodies[i].position.y += bodies[i].velocity.y;
+        if (bodies[i].position.y + bodies[i].radius >= WIN_H - 1) {
+          bodies[i].position.y = WIN_H - 1 - bodies[i].radius;
+          bodies[i].velocity.y = -bodies[i].velocity.y;
+        } else if (bodies[i].position.y - bodies[i].radius <= 0) { 
+          bodies[i].position.y = bodies[i].radius;
+          bodies[i].velocity.y = -bodies[i].velocity.y;
+        } 
+      } 
+
+      
+      glfwSwapBuffers(window);
+      glfwPollEvents();
+      last_frame = now;
+    }
   }
 
   glfwTerminate();
