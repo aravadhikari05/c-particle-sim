@@ -20,6 +20,8 @@ struct vec4 {
 
 struct vec2 vec2_create(float x, float y);
 
+struct vec2 vec2_zero(void);
+
 struct vec4 vec4_create(float x, float y, float z, float w);
 
 struct vec2 vec2_add(struct vec2 a, struct vec2 b);
@@ -30,5 +32,5 @@ float vec2_dot(struct vec2 a, struct vec2 b);
 
 struct vec2 vec2_inverse(struct vec2 a);
 
-struct vec2 vec2_scalar(struct vec2 a, float s);
+struct vec2 vec2_scale(struct vec2 a, float s);
 
