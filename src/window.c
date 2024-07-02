@@ -129,36 +129,36 @@ int main(void) {
   struct body bodies[len_bodies];
   for (int i = 0; i < len_bodies; i++) {
     float x_pos = (WIN_W / (float) len_bodies * i) + (WIN_W / (float) len_bodies * 0.5f);
-    struct body bod = body_create(i+1, i+1, vec2_create(x_pos, 250.0f), vec2_zero()); 
+    struct body bod = body_create(i+1, i+1, vec2_create(x_pos, 250.0f), vec2_create(0, -1)); 
     bodies[i] = bod;
   }
-  float grav = 25000.0f;
+  float grav = 5.0f;
 
   const double fps_limit = 1.0/60.0;
   double last_update = 0.0;
-  double last_frame = 0.0; 
 
+  int cont = 0;
   while (!glfwWindowShouldClose(window)) {
     double now = glfwGetTime();
     double delta_time = now - last_update;
     glfwPollEvents();
     
-    process_input(window);
-    for (int i = 0; i < len_bodies; i++) { 
-      bodies[i].acceleration.y = grav / bodies[i].mass;
-      bodies[i].velocity.y += bodies[i].acceleration.y * delta_time;
-      bodies[i].position.y += bodies[i].velocity.y * delta_time;
 
-      if (bodies[i].position.y + bodies[i].radius >= WIN_H - 1) {
-        bodies[i].position.y = WIN_H - 1 - bodies[i].radius;
-        bodies[i].velocity.y = -bodies[i].velocity.y;
-      } else if (bodies[i].position.y - bodies[i].radius <= 0) { 
-        bodies[i].position.y = bodies[i].radius;
-        bodies[i].velocity.y = -bodies[i].velocity.y;
+    if (delta_time > fps_limit) {
+      last_update = now;
+      for (int i = 0; i < len_bodies; i++) { 
+        bodies[i].acceleration.y = grav / bodies[i].mass;
+        bodies[i].velocity.y += bodies[i].acceleration.y;
+        bodies[i].position.y += bodies[i].velocity.y;
+
+        if (bodies[i].position.y + bodies[i].radius >= WIN_H - 1) {
+          bodies[i].position.y = WIN_H - 1 - bodies[i].radius;
+          bodies[i].velocity.y = -bodies[i].velocity.y;
+        } else if (bodies[i].position.y - bodies[i].radius <= 0) { 
+          bodies[i].position.y = bodies[i].radius;
+          bodies[i].velocity.y = -bodies[i].velocity.y;
+        } 
       } 
-    } 
-
-    if (now - last_frame >= fps_limit) {
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
       glClear(GL_COLOR_BUFFER_BIT);
 
@@ -177,10 +177,11 @@ int main(void) {
       for (int i = 0; i < len_bodies; i++) {
         draw_circle(shader_program, circle_vao, bodies[i].position, bodies[i].radius, vec4_create(255, 255, 0, 1.0), (num_vertices - 2) * 3);   
       } 
-      last_frame = now;
       glfwSwapBuffers(window); 
+      process_input(window);
     }
-    last_update = now;
+
+  
   }
 
   glfwTerminate();
