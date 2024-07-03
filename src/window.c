@@ -114,11 +114,11 @@ int main(void) {
   circle_ebo = bo_create_and_store(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * 3 * (num_vertices-2), circle_indices, true);
   vao_attrib(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*) 0);
     
-  int len_bodies = 10;
+  int len_bodies = 2;
   struct body bodies[len_bodies];
   for (int i = 0; i < len_bodies; i++) {
     float x_pos = (WIN_W / (float) len_bodies * i) + (WIN_W / (float) len_bodies * 0.5f);
-    struct body bod = body_create(10.0f, 10.0f, vec2_create(x_pos, 250.0f), vec2_create(0, -1)); 
+    struct body bod = body_create(10.0f, 10.0f, vec2_create(x_pos, 250.0f), vec2_create(0, 0)); 
     bodies[i] = bod;
   }
   float grav = 5.0f;
@@ -132,17 +132,16 @@ int main(void) {
     double delta_time = now - last_update;
     glfwPollEvents();
     
-
     if (delta_time > fps_limit) {
-      printf("%f\n", delta_time);
       last_update = now;
       for (int i = 0; i < len_bodies; i++) {
-        body_update(&bodies[i], fps_limit); 
+        if (i == 0)
+          body_update(&bodies[i], fps_limit, 1); 
+        else  
+          body_update(&bodies[i], fps_limit, 0); 
         if (bodies[i].pos.y + bodies[i].radius >= WIN_H - 1) {
-          bodies[i].pos.y = WIN_H - 1 - bodies[i].radius;
           bodies[i].vel.y = -bodies[i].vel.y;
         } else if (bodies[i].pos.y - bodies[i].radius <= 0) { 
-          bodies[i].pos.y = bodies[i].radius;
           bodies[i].vel.y = -bodies[i].vel.y;
         } 
       } 
@@ -167,10 +166,7 @@ int main(void) {
       glfwSwapBuffers(window); 
       process_input(window);
     }
-
-  
   }
-
   glfwTerminate();
   return 0;
 }

@@ -11,4 +11,4 @@ struct body {
 
 struct body body_create(float mass, float radius, struct vec2 pos, struct vec2 vel);
 
-void body_update(struct body* body, double dt);
+void body_update(struct body* body, double dt, int drag);
