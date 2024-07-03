@@ -86,12 +86,6 @@ int main(void) {
 
   GLuint shader_program = shader_program_create(vertex_shader_source, fragment_shader_source); 
 
-  float vertices[] = {
-     0.5f,  0.5f,
-     0.5f, -0.5f,
-    -0.5f, -0.5f,
-    -0.5f,  0.5f,
-  };
 
   float point_vertices[] = {
      0.0f,  0.0f
@@ -101,12 +95,7 @@ int main(void) {
     -0.5f, 0.0f,
      0.5f, 0.0f
   };
-
-  unsigned int indices[] = {
-    0, 1, 3,
-    1, 2, 3 
-  };
-  
+ 
   int num_vertices = 32;
   float size = 1.0f/WIN_W; 
 
@@ -129,12 +118,12 @@ int main(void) {
   struct body bodies[len_bodies];
   for (int i = 0; i < len_bodies; i++) {
     float x_pos = (WIN_W / (float) len_bodies * i) + (WIN_W / (float) len_bodies * 0.5f);
-    struct body bod = body_create(i+1, i+1, vec2_create(x_pos, 250.0f), vec2_create(0, -1)); 
+    struct body bod = body_create(10.0f, 10.0f, vec2_create(x_pos, 250.0f), vec2_create(0, -1)); 
     bodies[i] = bod;
   }
   float grav = 5.0f;
 
-  const double fps_limit = 1.0/60.0;
+  double fps_limit = 1.0/60.0;
   double last_update = 0.0;
 
   int cont = 0;
@@ -145,18 +134,16 @@ int main(void) {
     
 
     if (delta_time > fps_limit) {
+      printf("%f\n", delta_time);
       last_update = now;
-      for (int i = 0; i < len_bodies; i++) { 
-        bodies[i].acceleration.y = grav / bodies[i].mass;
-        bodies[i].velocity.y += bodies[i].acceleration.y;
-        bodies[i].position.y += bodies[i].velocity.y;
-
-        if (bodies[i].position.y + bodies[i].radius >= WIN_H - 1) {
-          bodies[i].position.y = WIN_H - 1 - bodies[i].radius;
-          bodies[i].velocity.y = -bodies[i].velocity.y;
-        } else if (bodies[i].position.y - bodies[i].radius <= 0) { 
-          bodies[i].position.y = bodies[i].radius;
-          bodies[i].velocity.y = -bodies[i].velocity.y;
+      for (int i = 0; i < len_bodies; i++) {
+        body_update(&bodies[i], fps_limit); 
+        if (bodies[i].pos.y + bodies[i].radius >= WIN_H - 1) {
+          bodies[i].pos.y = WIN_H - 1 - bodies[i].radius;
+          bodies[i].vel.y = -bodies[i].vel.y;
+        } else if (bodies[i].pos.y - bodies[i].radius <= 0) { 
+          bodies[i].pos.y = bodies[i].radius;
+          bodies[i].vel.y = -bodies[i].vel.y;
         } 
       } 
       glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
@@ -175,7 +162,7 @@ int main(void) {
       draw_circle(shader_program, circle_vao, vec2_create(xpos, ypos), 5.0f, vec4_create(0, 255, 0, 1.0), (num_vertices - 2) * 3); 
 
       for (int i = 0; i < len_bodies; i++) {
-        draw_circle(shader_program, circle_vao, bodies[i].position, bodies[i].radius, vec4_create(255, 255, 0, 1.0), (num_vertices - 2) * 3);   
+        draw_circle(shader_program, circle_vao, bodies[i].pos, bodies[i].radius, vec4_create(255, 255, 0, 1.0), (num_vertices - 2) * 3);   
       } 
       glfwSwapBuffers(window); 
       process_input(window);

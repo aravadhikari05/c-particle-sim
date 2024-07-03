@@ -4,10 +4,11 @@
 struct body {
   float mass;
   float radius;
-  struct vec2 position;
-  struct vec2 velocity;
-  struct vec2 acceleration;
+  struct vec2 pos;
+  struct vec2 vel;
+  struct vec2 acc;
 };
 
-struct body body_create(float mass, float radius, struct vec2 position, struct vec2 velocity);
+struct body body_create(float mass, float radius, struct vec2 pos, struct vec2 vel);
 
+void body_update(struct body* body, double dt);
