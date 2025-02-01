@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
 
 #include "shader.h"
 
@@ -32,6 +35,41 @@ static void log_error(GLuint obj, int type) {
       exit(-1);
   }
 }
+
+int shader_from_file(const char *filename, char* buff, int buff_size) {
+  //using unbuffered functions
+
+  int fd = open(filename, O_RDONLY, 0);
+  if (fd == -1) {
+    const char error[] = "Could not open file\n";
+    write(STDERR_FILENO, error, strlen(error));
+    return -1;
+  }
+
+  int bytes_read = 0;
+  int total_bytes_read = 0;
+  do {
+    bytes_read = read(fd, buff + total_bytes_read, buff_size - total_bytes_read);
+    if (bytes_read < 0) {
+      close(fd);
+      const char error[] = "Could not read file\n";
+      write(STDERR_FILENO, error, strlen(error));
+      return -1;
+    } 
+    total_bytes_read += bytes_read;
+  } while (bytes_read > 0); 
+
+  if (total_bytes_read >= buff_size) {
+    close(fd);
+    const char error[] = "File size bigger than string size\n";
+    write(STDERR_FILENO, error, strlen(error));
+    return -1;
+  }
+  buff[total_bytes_read] = '\0'; 
+  return 0;
+}
+
+
 
 GLuint shader_program_create(const char* vertex_shader_source, const char* fragment_shader_source) {
   GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -74,4 +112,11 @@ void set_uniform_3f(GLuint shader_program, char* name, float x, float y, float z
 void set_uniform_4f(GLuint shader_program, char* name, float x, float y, float z, float w) {
   GLint uniform_location = glGetUniformLocation(shader_program, name);
   glUniform4f(uniform_location, x, y, z, w);
+}
+
+void reset_shader(GLuint shader_program) {
+    set_uniform_2f(shader_program, "translation", 0, 0);
+    set_uniform_2f(shader_program, "scale", 1, 1);
+    set_uniform_4f(shader_program, "color", 1, 1, 1, 1);
+    set_uniform_1f(shader_program, "rotation", 0);
 }

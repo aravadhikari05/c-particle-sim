@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <glad/gl.h>
 
+int shader_from_file(const char *filename, char* buffer, int size);
+
 GLuint shader_program_create(const char* vertex_shader_source, const char* fragment_shader_source);   
 
 void set_uniform_1f(GLuint shader_program, char* name, float x);

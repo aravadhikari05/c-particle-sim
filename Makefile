@@ -33,5 +33,11 @@ game: $(OBJ)
 %.o: %.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 
+test: src/main_test
+	./src/main_test
+
+src/main_test: src/main_test.c src/List.c src/QuadTree.c
+	$(CC) -o src/main_test src/main_test.c src/List.c src/QuadTree.c $(CFLAGS) $(LDFLAGS)
+
 clean:
 	rm -rf $(BIN) $(OBJ)

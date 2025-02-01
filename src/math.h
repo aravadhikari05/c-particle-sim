@@ -1,36 +1,42 @@
 #pragma once
 
-struct vec2 {
+typedef struct vec2 {
   float x;
   float y;
-};
+} vec2;
 
-struct vec3 {
+typedef struct vec3 {
   float x;
   float y;
   float z;
-};
+} vec3;
 
-struct vec4 {
+typedef struct vec4 {
   float x;
   float y;
   float z;
   float w;
-};
+} vec4;
 
-struct vec2 vec2_create(float x, float y);
+vec2 vec2_create(float x, float y);
 
-struct vec2 vec2_zero(void);
+vec2 vec2_zero(void);
 
 struct vec4 vec4_create(float x, float y, float z, float w);
 
-struct vec2 vec2_add(struct vec2 a, struct vec2 b);
+vec2 vec2_add(vec2 a, vec2 b);
 
-struct vec2 vec2_multiply(struct vec2 a, struct vec2 b);
+vec2 vec2_sub(vec2 a, vec2 b);
 
-float vec2_dot(struct vec2 a, struct vec2 b);
+vec2 vec2_mult(vec2 a, vec2 b);
 
-struct vec2 vec2_inverse(struct vec2 a);
+float vec2_dot(vec2 a, vec2 b);
 
-struct vec2 vec2_scale(struct vec2 a, float s);
+float vec2_mag(vec2 a); 
+
+vec2 vec2_unit(vec2 a);
+
+vec2 vec2_inv(vec2 a);
+
+vec2 vec2_scale(vec2 a, float s);
 
