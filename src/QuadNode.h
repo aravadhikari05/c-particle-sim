@@ -19,7 +19,7 @@ typedef struct QuadNode {
 
   AABB bbox;
 } QuadNode;
-
+/*
 typedef struct QuadNode {
   int first_child; //points to quad node or element instance
   int num_elements; //number of elements 
@@ -31,6 +31,7 @@ typdef struct ElementInstance {
   int next; //index of next element instance in leaf
   int element; //index of actual element;
 }
+*/
 
 
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "math.h"
-#include "body.h"
+#include <stdbool.h>
 
 typedef struct collision_data {
   bool hit;

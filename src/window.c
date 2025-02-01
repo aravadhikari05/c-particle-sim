@@ -10,7 +10,6 @@
 #include "shader.h"
 #include "draw.h"
 #include "math.h"
-#include "body.h"
 #include "game.h"
 #include "QuadTree.h"
 #include "QuadNode.h"
